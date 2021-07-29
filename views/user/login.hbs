@@ -1,5 +1,8 @@
 <div class="login-form">
   <form action="/login" method="post">
+    {{#if loginErr}}
+      <p class="err">{{loginErr}}</p>
+    {{/if}}
     <h2 class="text-center">Log in</h2>
     <div class="form-group">
       <input
