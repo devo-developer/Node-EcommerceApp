@@ -2,8 +2,8 @@
   <div class="container mt-5">
     <div class="row">
       {{#each products}}
-        <div class="col-md-3" style="margin-bottom: 25px;">
-          <div class="card" style="width: 16rem; height: 28rem">
+        <div class="col-md-3 p-3">
+          <div class="card">
             <img
               class="card-img-top"
               src="/product-images/{{this._id}}.jpg"
@@ -15,9 +15,10 @@
               <h6 class="card-title">₹ {{this.Price}}</h6>
               <p
                 class="card-text"
-                style="height: 10rem;"
+                style="height: 5rem;"
               >{{this.Description}}</p>
-              <a href="#" class="btn btn-primary">Add to cart</a>
+              <a href="/add-to-cart/{{this._id}}" class="btn btn-primary">Add to
+                cart</a>
             </div>
           </div>
         </div>

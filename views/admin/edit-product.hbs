@@ -42,14 +42,20 @@
             rows="3"
           >{{product.Description}}</textarea>
 
+          <label for="">Image</label>
           <img
             src="/product-images/{{product._id}}.jpg"
             alt=""
             style="width:100px; height:auto"
+            id="imageView"
+            class="p-3"
           />
-
-          <label for="">Image</label>
-          <input type="file" name="Image" class="form-control" />
+          <input
+            type="file"
+            name="Image"
+            class="form-control"
+            onchange="viewImage(event)"
+          />
 
           <button type="submit" class="btn btn-success mt-4">Submit</button>
         </form>
@@ -57,3 +63,9 @@
     </div>
   </div>
 </section>
+
+<script>
+  function viewImage(event){
+  document.getElementById('imageView').src=URL.createObjectURL(event.target.files[0])
+  }
+</script>
