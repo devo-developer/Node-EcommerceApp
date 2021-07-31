@@ -1,1 +1,103 @@
-<h1>Cart is Empty</h1>
+<section>
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-8">
+        <div class="card">
+          <div class="card-header">
+            MY CART
+          </div>
+          {{!-- Add cart items here --}}
+          {{#each products}}
+         
+          <div class="card-body border-bottom">
+             {{#each this.products}}
+            <div class="row">
+              <div class="col-3 align-items-center">
+                <img
+                  src="/product-images/{{this._id}}.jpg"
+                  class="rounded float-left mr-3"
+                  alt="..."
+                  style="width: 140px; height:140px"
+                />
+              </div>
+
+              <div class="col-7">
+                <h5 class="card-title">{{this.Name}}</h5>
+                <p>{{this.Category}}<p>
+                <h6>₹ {{this.Price}}</h6>
+                <p class="card-text">{{this.Description}}</p>
+              </div>
+              <div class="col-2">
+                  
+              </div>
+            </div>
+            {{/each}}
+            <div class="row">
+              <div class="col-3">
+                <div
+                  class="d-flex align-items-center justify-content-center w-100 pt-3"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-light btn-circle btn-sm mr-3 border-secondary"
+                    style="width:35px;"
+                  >-</button><input
+                    type="text"
+                    name="count"
+                    value="{{this.quantity}}"
+                    class="w-25"
+                    style="height:35px; text-align: center;"
+                  /><button
+                    type="button"
+                    class="btn btn-light btn-circle btn-sm ml-3 border-secondary"
+                    style="width:35px;"
+                  >+</button></div>
+              </div>
+              <div class="col-7"></div>
+              <div class="col-2">
+                <a href="#" class="btn btn-danger btn-lg">Remove</a>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+          {{!-- footer --}}
+          <div class="card-footer bg-transparent border-muted d-flex justify-content-end"><a
+              href="#"
+              class="btn btn-warning btn-lg "
+            >Place Order</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="card">
+          <div class="card-header">
+            PRICE DETAILS
+          </div>
+          <div class="card-body">
+              <div class="row">
+                <div class="col-7">
+                    <h5 class="card-title">Price</h5>
+                    <h5 class="card-text">Discount</h5>
+                    <h5 class="card-text">Delivery Charges</h5>
+                    <h5 class="card-text mt-4">Total Amount</h5>
+                </div>
+                <div class="col-5">
+                    <h5 class="card-title float-right">₹ 12000.00</h5>
+                    <h5 class="card-text float-right">- ₹ 1000.00</h5>
+                    <h5 class="card-text float-right">Free</h5>
+                    <h5 class="card-text float-right mt-4">₹ 12000.00</h5>
+                </div>
+              </div>
+            <div>
+                
+            </div>
+            <div class="card-footer bg-transparent border-muted mt-4">
+                <h6 class="card-text">You will save ₹ 1000 on this order</h6>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+</section>
