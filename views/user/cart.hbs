@@ -1,6 +1,6 @@
 <section>
   <div class="container">
-    <div class="row mt-3">
+    <div class="row mt-3 mb-5">
       <div class="col-8">
         <div class="card">
           <div class="card-header">
@@ -39,14 +39,14 @@
                     type="button"
                     class="btn btn-light btn-circle btn-sm mr-3 border-secondary"
                     style="width:35px;"
-                    onclick="changeQuantity('{{this._id}}', '{{this.product._id}}',-1)"
+                    onclick="changeQuantity('{{this._id}}', '{{this.product._id}}','{{../user}}',-1)"
                   >-</button>
                   <span id="{{this.product._id}}">{{this.quantity}}</span>
                   <button
                     type="button"
                     class="btn btn-light btn-circle btn-sm ml-3 border-secondary"
                     style="width:35px;"
-                    onclick="changeQuantity('{{this._id}}', '{{this.product._id}}',1)"
+                    onclick="changeQuantity('{{this._id}}', '{{this.product._id}}','{{../user}}',1)"
                   >+</button></div>
               </div>
               <div class="col-7"></div>
@@ -78,10 +78,10 @@
                     <h5 class="card-text mt-4">Total Amount</h5>
                 </div>
                 <div class="col-5">
-                    <h5 class="card-title float-right">₹ 12000.00</h5>
-                    <h5 class="card-text float-right">- ₹ 1000.00</h5>
-                    <h5 class="card-text float-right">Free</h5>
-                    <h5 class="card-text float-right mt-4">₹ 12000.00</h5>
+                    <h5 class="card-title float-right"><span id="total">₹ {{totalValue}}.00</span></h5>
+                    <h5 class="card-text float-right"><span id="">- ₹ 1000.00</span></h5>
+                    <h5 class="card-text float-right"><span id="">Free</span></h5>
+                    <h5 class="card-text float-right mt-4"><span id="nettotal">₹ {{totalValue}}.00</span></h5>
                 </div>
               </div>
             <div>
@@ -97,13 +97,14 @@
 </section>
 
 <script>
-  function changeQuantity(cartId, proId, count) {
+  function changeQuantity(cartId, proId, userId, count) {
     let quantity=parseInt(document.getElementById(proId).innerHTML)
     count=parseInt(count)
 
   $.ajax({
     url: "/change-product-quantity",
     data: {
+      user:userId,
       cart: cartId,
       product: proId,
       count: count,
@@ -116,6 +117,8 @@
         location.reload()
       } else {
         document.getElementById(proId).innerHTML=quantity+count
+        document.getElementById('total').innerHTML=response.total
+        document.getElementById('nettotal').innerHTML=response.total
       }
     },
   });
