@@ -1,0 +1,46 @@
+<section>
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            MY ORDERS
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3 mb-5">
+      <div class="col-12">
+        {{#each orders}}
+        <div class="card">
+          <div class="card-body border-bottom">
+            <div class="row">
+              <div class="col-5">
+                <h6>
+                  Delivery Address
+                </h6>
+                <p>{{this.deliveryDetails.address}} - {{this.deliveryDetails.pincode}}</p>
+                <h6>Mobile</h6>
+                <p>{{this.deliveryDetails.mobile}}</p>
+              </div>
+              <div class="col-5">
+                <h6>Payment mode</h6>
+                <p>{{this.paymentMethod}}</p>
+                <h6>Status</h6>
+                <p>{{this.status}}</p><p>{{this._id}}</p>
+              </div>
+              <div class="col-2">
+              <a type="button" class="btn btn-primary" href="/view-order-products/{{this._id}}" >View Products</a>
+              <div style="margin-top: 35">
+                <h6>Total : ₹ {{this.totalAmount}}</h6>
+                
+              </div>
+              </div>
+            </div>
+          {{!-- Add Order items here --}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+  </div>
+</section>

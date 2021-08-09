@@ -72,7 +72,10 @@ router.get("/cart", verifyLogin, async (req, res) => {
     cartCount = await userHelpers.getCartCount(req.session.user._id);
   }
   let products = await userHelpers.getCartProducts(req.session.user._id);
-  let totalValue = await userHelpers.getTotalAmount(req.session.user._id);
+  let totalValue = 0;
+  if (products.length > 0) {
+    totalValue = await userHelpers.getTotalAmount(req.session.user._id);
+  }
   console.log(products);
   res.render("user/cart", {
     products,
@@ -104,9 +107,54 @@ router.get("/place-order", verifyLogin, async (req, res) => {
 router.post("/place-order", async (req, res) => {
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getTotalAmount(req.body.userId);
-  userHelpers.placeOrder(req.body, products, totalPrice).then((response) => {
-    res.json({ status: true });
+  userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
+    if (req.body["payment-method"] === "COD") {
+      res.json({ codSuccess: true });
+    }
+    // else if (req.body["payment-method"] == "ONLINE") {
+    //   userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
+    //     res.json(response);
+    //   });
+    // }
+    else {
+      //res.json({ status: false });
+      userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
+        res.json(response);
+      });
+    }
   });
   console.log(req.body);
 });
+
+router.get("/order-success", (req, res) => {
+  res.render("user/order-success", { user: req.session.user });
+});
+
+router.get("/orders", verifyLogin, async (req, res) => {
+  let orders = await userHelpers.getUserOrders(req.session.user._id);
+
+  let products = await userHelpers.getOrderProducts(req.session.user._id);
+  res.render("user/orders", { user: req.session.user, orders, products });
+});
+
+router.get("/view-order-products/:id", verifyLogin, async (req, res) => {
+  let products = await userHelpers.getOrderProducts(req.params.id);
+  res.render("user/view-order-products", { user: req.session.user, products });
+});
+
+router.post("/verify-payment", (req, res) => {
+  console.log(req.body);
+  userHelpers.verifyPayment(req.body).then(() => {
+    userHelpers
+      .changePaymentStatus(req.body["order[receipt]"])
+      .then(() => {
+        console.log("Payment Successfull");
+        res.json({ status: true });
+      })
+      .catch((err) => {
+        res.json({ status: true, errMsg: "" });
+      });
+  });
+});
+
 module.exports = router;

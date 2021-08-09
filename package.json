@@ -15,7 +15,9 @@
     "express-session": "^1.17.2",
     "hbs": "^4.1.2",
     "http-errors": "~1.6.3",
+    "moment": "^2.29.1",
     "mongodb": "^4.0.1",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "razorpay": "^2.0.6"
   }
 }

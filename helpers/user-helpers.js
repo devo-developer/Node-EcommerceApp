@@ -4,6 +4,11 @@ const bcrypt = require("bcrypt");
 const { USER_COLLECTION } = require("../config/collections");
 var objectId = require("mongodb").ObjectId;
 const { response } = require("express");
+const Razorpay = require("razorpay");
+var instance = new Razorpay({
+  key_id: "rzp_test_CAt7HN6R39WSNI",
+  key_secret: "wRB3s6BEfee7K33OmclIdoc6",
+});
 
 module.exports = {
   doSignup: (userData) => {
@@ -271,7 +276,6 @@ module.exports = {
   },
   placeOrder: (order, products, total) => {
     return new Promise((resolve, reject) => {
-      console.log(order, products, total);
       let status = order["payment-method"] == "COD" ? "placed" : "pending";
       let orderObj = {
         deliveryDetails: {
@@ -293,7 +297,7 @@ module.exports = {
           db.get()
             .collection(collection.CART_COLLECTION)
             .deleteOne({ user: objectId(order.userId) });
-          resolve();
+          resolve(response.insertedId.toString());
         });
     });
   },
@@ -304,6 +308,124 @@ module.exports = {
         .collection(collection.CART_COLLECTION)
         .findOne({ user: objectId(userId) });
       resolve(cart.products);
+    });
+  },
+  getUserOrders: (userId) => {
+    return new Promise(async (resolve, reject) => {
+      let orders = await db
+        .get()
+        .collection(collection.ORDER_COLLECTION)
+        .find({ userId: objectId(userId) })
+        // .aggregate([
+        //   {
+        //     $match: { userId: objectId(userId) },
+        //   },
+        //   {
+        //     $project: {
+        //       _id: 1,
+        //       deliveryDetails: 1,
+        //       userId: 1,
+        //       paymentMethod: 1,
+        //       totalAmount: 1,
+        //       status: 1,
+        //       date: 1,
+        //     },
+        //   },
+        // ])
+        .toArray();
+      // console.log(orders);
+      resolve(orders);
+    });
+  },
+  getOrderProducts: (orderId) => {
+    return new Promise(async (resolve, reject) => {
+      let products = await db
+        .get()
+        .collection(collection.ORDER_COLLECTION)
+        .aggregate([
+          {
+            $match: { _id: objectId(orderId) },
+          },
+          {
+            $unwind: "$products",
+          },
+          {
+            $project: {
+              item: "$products.item",
+              quantity: "$products.quantity",
+            },
+          },
+          {
+            $lookup: {
+              from: collection.PRODUCT_COLLECTION,
+              localField: "item",
+              foreignField: "_id",
+              as: "products",
+            },
+          },
+          {
+            $project: {
+              item: 1,
+              quantity: 1,
+              product: { $arrayElemAt: ["$products", 0] },
+            },
+          },
+        ])
+        .toArray();
+      resolve(products);
+    });
+  },
+  generateRazorpay: (orderId, total) => {
+    return new Promise(async (resolve, reject) => {
+      var options = {
+        amount: total * 100, // amount in the smallest currency unit
+        currency: "INR",
+        receipt: orderId,
+      };
+      instance.orders.create(options, function (err, order) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("New order " + order.receipt);
+          resolve(order);
+        }
+      });
+    });
+  },
+  verifyPayment: (details) => {
+    return new Promise((resolve, reject) => {
+      const crypto = require("crypto");
+      // const { createHmac } = await import("crypto");
+      let hmac = crypto.createHmac("sha256", "wRB3s6BEfee7K33OmclIdoc6");
+
+      hmac.update(
+        details["payment[razorpay_order_id]"] +
+          "|" +
+          details["payment[razorpay_payment_id]"]
+      );
+      hmac = hmac.digest("hex");
+      if (hmac == details["payment[razorpay_signature]"]) {
+        resolve();
+      } else {
+        reject();
+      }
+    });
+  },
+  changePaymentStatus: (orderId) => {
+    return new Promise((resolve, reject) => {
+      db.get()
+        .collection(collection.ORDER_COLLECTION)
+        .updateOne(
+          { _id: objectId(orderId) },
+          {
+            $set: {
+              status: "Placed",
+            },
+          }
+        )
+        .then(() => {
+          resolve();
+        });
     });
   },
 };
